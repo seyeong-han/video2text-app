@@ -58,18 +58,23 @@ export function useGenerate(prompt: string, videoId: string, enabled: boolean) {
   return useQuery({
     queryKey: [keys.VIDEOS, "generate", videoId, prompt],
     queryFn: async () => {
-      if (!enabled) {
-        return null;
-      }
-
-      const response = await apiConfig.SERVER.post(
-        `/videos/${videoId}/generate`,
-        {
-          data: { prompt: prompt },
+      try {
+        if (!enabled) {
+          return null;
         }
-      );
-      const respData = response.data;
-      return respData;
+
+        const response = await apiConfig.SERVER.post(
+          `/videos/${videoId}/generate`,
+          {
+            data: { prompt: prompt },
+          }
+        );
+        const respData = response.data;
+        return respData;
+      } catch (error) {
+        console.error("Error generating video data:", error);
+        throw error;
+      }
     },
     enabled: enabled,
   });
