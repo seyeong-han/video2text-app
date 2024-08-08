@@ -12,7 +12,7 @@ import ErrorFallback from "./common/ErrorFallback";
 
 /** App that generates the written summary, chapters, and highlights of a video
  *
- * App -> GenerateSocialPosts
+ * App -> SummarizeMain
  *
  */
 
