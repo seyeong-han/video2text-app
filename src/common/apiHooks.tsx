@@ -24,7 +24,11 @@ export function useGetVideos(indexId: string | undefined) {
   });
 }
 
-export function useGetVideo(indexId: string, videoId: string, enabled: boolean) {
+export function useGetVideo(
+  indexId: string,
+  videoId: string,
+  enabled: boolean
+) {
   return useQuery({
     queryKey: [keys.VIDEOS, indexId, videoId],
     queryFn: async () => {
