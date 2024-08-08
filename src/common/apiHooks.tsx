@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, QueryClient } from "@tanstack/react-query";
 import { keys } from "./keys";
 import apiConfig from "./apiConfig";
 import { Task } from "./types";
