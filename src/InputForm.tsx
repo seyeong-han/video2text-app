@@ -1,221 +1,157 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { keys } from "./common/keys";
-import "./InputForm.css";
 import { Video } from "./common/types";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faInstagram } from '@fortawesome/free-brands-svg-icons';
-import { faFacebook } from '@fortawesome/free-brands-svg-icons';
-import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
-import { faBlog } from '@fortawesome/free-solid-svg-icons';
-import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
+import "./InputForm.css";
 
-const WarningIcon:string = require("./common/Warning.svg").default;
+const WarningIcon: string = require("./common/Warning.svg").default;
 interface InputFormProps {
   video: Video;
-  setIsSubmitted: (value: boolean) => void;
-  isSubmitted: boolean;
-  setShowVideoTitle: (value: boolean) => void;
-  setPrompt: (value: string) => void;
-  setPlatform: (value: string) => void;
+  setField1Prompt: React.Dispatch<
+    React.SetStateAction<{ type: string | null } | null>
+  >;
+  setField2Prompt: React.Dispatch<
+    React.SetStateAction<{ type: string | null } | null>
+  >;
+  setField3Prompt: React.Dispatch<
+    React.SetStateAction<{ type: string | null } | null>
+  >;
+  field1: string;
+  field2: string;
+  field3: string;
+  setIsSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowVideoTitle: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowCheckWarning: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-/** Form to get user input
- *
- * GenerateSocialPosts -> { InputForm }
- *
- */
-
-export const InputForm: React.FC<InputFormProps> = ({
+export function InputForm({
   video,
+  setField1Prompt,
+  setField2Prompt,
+  setField3Prompt,
+  field1,
+  field2,
+  field3,
   setIsSubmitted,
-  isSubmitted,
   setShowVideoTitle,
-  setPrompt,
-  setPlatform,
-}) => {
-  const [showCheckWarning, setShowCheckWarning] = useState(false);
+  setShowCheckWarning,
+}: InputFormProps): JSX.Element {
   const queryClient = useQueryClient();
-  const instagramRef = useRef<HTMLInputElement | null>(null);
-  const facebookRef = useRef<HTMLInputElement | null>(null);
-  const xRef = useRef<HTMLInputElement | null>(null);
-  const blogRef = useRef<HTMLInputElement | null>(null);
-  const textRadioRef = useRef<HTMLInputElement | null>(null);
-  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const handleOthersSelect = () => {
-    setPrompt("")
-    setPlatform("")
-    setIsSubmitted(false)
-    setShowCheckWarning(false);
-    queryClient.invalidateQueries({queryKey: [keys.VIDEOS, video?._id, "generate", prompt]});
-    if (textAreaRef.current) {
-      textAreaRef.current.value="";
-      textAreaRef.current.style.display = "block";
-    }
-  };
+  const summaryRef = useRef<HTMLInputElement>(null);
+  const chaptersRef = useRef<HTMLInputElement>(null);
+  const highlightsRef = useRef<HTMLInputElement>(null);
 
-  const handleOthersDeselect = () => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.display = "none";
-    }
-  };
-
-  const handleRadioChange = () => {
-    if (!textRadioRef.current?.checked && textAreaRef.current) {
-      handleOthersDeselect();
-      setPrompt("")
-      setPlatform("")
-      setIsSubmitted(false)
-      setShowCheckWarning(false);
-      queryClient.invalidateQueries({queryKey: [keys.VIDEOS, video?._id, "generate", prompt]});
-      textAreaRef.current.value="";
-    }
-  };
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleClick(
+    event: React.MouseEvent<HTMLButtonElement>
+  ): Promise<void> {
     event.preventDefault();
-    let promptValue = "";
-    let platformValue = "";
 
-    if (instagramRef.current?.checked) {
-      promptValue = "Write a summary. Format should be a Instagram post. 100 words or less. Use emojis. Do not provide your answer (e.g., Certainly). Provide only the summary. Do not provide an explanation. ";
-      platformValue = "Instagram";
-    } else if (facebookRef.current?.checked) {
-      promptValue = "Write a summary. Format should be a Facebook post. 150 words or less. Use emojis. Do not provide your answer (e.g., Certainly). Provide only the summary. Do not provide an explanation. ";
-      platformValue = "Facebook";
-    } else if (xRef.current?.checked) {
-      promptValue = "Write a summary. Format should be a X (formerly Twitter) post. 50 words or less. Use emojis. Do not provide your answer (e.g., Certainly). Provide only the summary. Do not provide an explanation. ";
-      platformValue = "X";
-    } else if (blogRef.current?.checked) {
-      promptValue = "Write a summary with details. Format should be a blog post. Divide sections with subtitles. Do not provide your answer (e.g., Certainly). Provide only the summary. Do not provide an explanation. ";
-      platformValue = "Blog";
-    } else if (textRadioRef.current?.checked) {
-      const inputValue = textAreaRef.current?.value.trim();
-      if (inputValue?.length && inputValue?.length > 0) {
-        promptValue = inputValue;
-        platformValue = `"${inputValue}"`;
-      } else {
-        setShowCheckWarning(true);
-        return;
-      }
+    if (summaryRef.current?.checked) {
+      setField1Prompt({ type: field1 });
+    } else {
+      setField1Prompt(null);
     }
-    setPrompt(promptValue);
+
+    if (chaptersRef.current?.checked) {
+      setField2Prompt({ type: field2 });
+    } else {
+      setField2Prompt(null);
+    }
+
+    if (highlightsRef.current?.checked) {
+      setField3Prompt({ type: field3 });
+    } else {
+      setField3Prompt(null);
+    }
+
+    if (
+      !summaryRef.current?.checked &&
+      !chaptersRef.current?.checked &&
+      !highlightsRef.current?.checked
+    ) {
+      setShowVideoTitle(false);
+      setShowCheckWarning(true);
+      return;
+    }
+
     setIsSubmitted(true);
     setShowVideoTitle(true);
-    setPlatform(platformValue);
+    setShowCheckWarning(false);
+
+    queryClient.invalidateQueries({
+      queryKey: [keys.VIDEOS, video._id, "summarize", "chapters", "highlights"],
+    });
   }
 
+  useEffect(() => {
+    if (summaryRef.current) summaryRef.current.checked = true;
+    if (chaptersRef.current) chaptersRef.current.checked = true;
+    if (highlightsRef.current) highlightsRef.current.checked = true;
+  }, []);
+
   return (
-    <div className="inputForm" data-cy="data-cy-inputForm">
-      <div className="inputForm__title">
-        Tell me what social post you want to generate
-      </div>
-      <form className="inputForm__form" onSubmit={handleSubmit}>
-        <label>
-          <input
-            type="radio"
-            className="inputForm__form__radio"
-            data-cy="data-cy-inputForm-radio"
-            name="platform"
-            value="instagram"
-            id="instagram"
-            ref={instagramRef}
-            disabled={isSubmitted}
-            onChange={handleRadioChange}
-          />
-          <FontAwesomeIcon icon={faInstagram} /> Instagram
-        </label>{" "}
-        <label>
-          <input
-            type="radio"
-            className="inputForm__form__radio"
-            data-cy="data-cy-inputForm-radio"
-            name="platform"
-            value="facebook"
-            ref={facebookRef}
-            disabled={isSubmitted}
-            onChange={handleRadioChange}
-          />
-          <FontAwesomeIcon icon={faFacebook} /> Facebook
-        </label>{" "}
-        <div className="inputForm_form_radioWrapper">
-          <label>
+    <div className="inputForm">
+      <div className="inputForm__title">Choose a summary format</div>
+      <form className="inputForm__form">
+        <div className="inputForm__form__checkboxes">
+          <div className="inputForm__form__checkboxes__wrapper">
             <input
-              type="radio"
-              className="inputForm__form__radio"
-              data-cy="data-cy-inputForm-radio"
-              name="platform"
-              value="x"
-              ref={xRef}
-              disabled={isSubmitted}
-              onChange={handleRadioChange}
+              className="inputForm__form__checkboxes__wrapper__checkbox"
+              type="checkbox"
+              data-cy="data-cy-checkbox-summary"
+              id={field1}
+              name={field1}
+              ref={summaryRef}
             />
-            <FontAwesomeIcon icon={faXTwitter} /> X(Twitter)
-          </label>{" "}
-          <label>
-            <input
-              type="radio"
-              className="inputForm__form__radio"
-              data-cy="data-cy-inputForm-radio"
-              name="platform"
-              value="blog"
-              ref={blogRef}
-              disabled={isSubmitted}
-              onChange={handleRadioChange}
-            />
-            <FontAwesomeIcon icon={faBlog} /> Blog
-          </label>{" "}
-          <label>
-            <input
-              type="radio"
-              className="inputForm__form__radio"
-              data-cy="data-cy-inputForm-radio"
-              name="platform"
-              value="others"
-              ref={textRadioRef}
-              onChange={handleOthersSelect}
-              onBlur={(e) => {
-                if (!textAreaRef.current?.contains(e.relatedTarget as Node)) {
-                  handleOthersDeselect();
-                }
-              }}
-              disabled={isSubmitted}
-            />
-            <FontAwesomeIcon icon={faCommentDots} /> Others
-            </label>{" "}
-            <textarea
-              className="inputForm__form__textarea"
-              data-cy="data-cy-inputForm-textarea"
-              id="prompt"
-              name="prompt"
-              placeholder="Write your own requirements / prompt here"
-              ref={textAreaRef}
-              style={{ display: showCheckWarning ? "block" : "none" }}
-              disabled={isSubmitted}
-              />
-            {showCheckWarning && (
-              <div className="inputForm__form__warningMessageWrapper">
-                <img
-                  className="inputForm__form__warningMessageWrapper__warningIcon"
-                  src={WarningIcon}
-                  alt="WarningIcon"
-                ></img>
-                <div className="inputForm__form__warningMessageWrapper__warningMessage">
-                Please provide your own requirements / prompt
-                </div>
-              </div>
-            )}
+            <label
+              className="inputForm__form__checkboxes__wrapper__label"
+              htmlFor={field1}
+            >
+              {field1}
+            </label>
           </div>
+          <div className="inputForm__form__checkboxes__wrapper">
+            <input
+              className="inputForm__form__checkboxes__wrapper__checkbox"
+              type="checkbox"
+              ref={chaptersRef}
+              data-cy="data-cy-checkbox-chapters"
+              id={field2}
+              name={field2}
+            />
+            <label
+              className="inputForm__form__checkboxes__wrapper__label"
+              htmlFor={field2}
+            >
+              {field2}s
+            </label>
+          </div>
+          <div className="inputForm__form__checkboxes__wrapper">
+            <input
+              className="inputForm__form__checkboxes__wrapper__checkbox"
+              type="checkbox"
+              ref={highlightsRef}
+              data-cy="data-cy-checkbox-highlights"
+              id={field3}
+              name={field3}
+            />
+            <label
+              className="inputForm__form__checkboxes__wrapper__label"
+              htmlFor={field3}
+            >
+              {field3}s
+            </label>
+          </div>
+        </div>
         <button
           className="inputForm__form__button"
-          data-cy="data-cy-inputForm-button"
-          type="submit"
-          disabled={isSubmitted}
+          data-cy="data-cy-generate-button"
+          onClick={handleClick}
         >
           Generate
-        </button>{" "}
+        </button>
       </form>
     </div>
   );
-};
+}
