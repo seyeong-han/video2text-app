@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import  Video from "./Video";
+import Video from "./Video";
 import { InputForm } from "./InputForm";
 import { VideoFileUploadForm } from "./VideoFileUploadForm";
 import { Result } from "./Result";
-import "./GenerateSocialPosts.css";
+import "./SummarizeMain.css";
 import { useGetVideo } from "./common/apiHooks";
 import { keys } from "./common/keys";
 import LoadingSpinner from "./common/LoadingSpinner";
 import { ErrorBoundary } from "./common/ErrorBoundary";
 
-const greenWarningIcon:string = require("./common/Warning_Green.svg").default;
+const greenWarningIcon: string = require("./common/Warning_Green.svg").default;
 
 /** Generate Titles and Hashtags
  *
@@ -18,13 +18,17 @@ const greenWarningIcon:string = require("./common/Warning_Green.svg").default;
  *
  */
 
-interface GenerateSocialPostsProps {
+interface SummarizeMainProps {
   index: string;
   videoId: string;
   refetchVideos: () => void;
 }
 
-export const GenerateSocialPosts:React.FC<GenerateSocialPostsProps> = ({ index, videoId, refetchVideos }) => {
+export const SummarizeMain: React.FC<SummarizeMainProps> = ({
+  index,
+  videoId,
+  refetchVideos,
+}) => {
   const { data: video, isLoading } = useGetVideo(
     index,
     videoId,
@@ -44,7 +48,7 @@ export const GenerateSocialPosts:React.FC<GenerateSocialPostsProps> = ({ index, 
   const vidTitleClean = decodeAndCleanFilename(vidTitleRaw);
 
   /** Return clean video file name  */
-  function decodeAndCleanFilename(filename:string) {
+  function decodeAndCleanFilename(filename: string) {
     let decodedFilename = filename;
     try {
       decodedFilename = decodeURIComponent(filename);
@@ -73,7 +77,7 @@ export const GenerateSocialPosts:React.FC<GenerateSocialPostsProps> = ({ index, 
     setShowVideoTitle(false);
     setSelectedFile(null);
     setIsFileUploading(false);
-    setPlatform("")
+    setPlatform("");
   }, [index, videoId, queryClient]);
 
   return (
@@ -82,31 +86,31 @@ export const GenerateSocialPosts:React.FC<GenerateSocialPostsProps> = ({ index, 
         Generate Social Posts for Your Video
       </h1>
       <ErrorBoundary>
-      {isLoading && <LoadingSpinner />}
-      <VideoFileUploadForm
-        index={index}
-        refetchVideos={refetchVideos}
-        selectedFile={selectedFile}
-        setSelectedFile={setSelectedFile}
-        isFileUploading={isFileUploading}
-        setIsFileUploading={setIsFileUploading}
-      />
-      {!isLoading && !video && (
-        <div className="GenerateSocialPosts__uploadMessageWrapper">
-          <img
-            className="GenerateSocialPosts__uploadMessageWrapper__warningIcon"
-            src={greenWarningIcon}
-            alt="greenWarningIcon"
-          ></img>
-          <div>
-            <p className="GenerateSocialPosts__uploadMessageWrapper__message">
-              Please upload a video
-            </p>
+        {isLoading && <LoadingSpinner />}
+        <VideoFileUploadForm
+          index={index}
+          refetchVideos={refetchVideos}
+          selectedFile={selectedFile}
+          setSelectedFile={setSelectedFile}
+          isFileUploading={isFileUploading}
+          setIsFileUploading={setIsFileUploading}
+        />
+        {!isLoading && !video && (
+          <div className="GenerateSocialPosts__uploadMessageWrapper">
+            <img
+              className="GenerateSocialPosts__uploadMessageWrapper__warningIcon"
+              src={greenWarningIcon}
+              alt="greenWarningIcon"
+            ></img>
+            <div>
+              <p className="GenerateSocialPosts__uploadMessageWrapper__message">
+                Please upload a video
+              </p>
+            </div>
           </div>
-        </div>
-      )}
-      {!isFileUploading && (
-        <>
+        )}
+        {!isFileUploading && (
+          <>
             {video && (
               <Video
                 url={video.hls?.video_url}
@@ -114,27 +118,33 @@ export const GenerateSocialPosts:React.FC<GenerateSocialPostsProps> = ({ index, 
                 height={"214px"}
               />
             )}
-          {showVideoTitle && (
-            <div className="GenerateSocialPosts__videoTitle">
-              {vidTitleClean}
-            </div>
-          )}
-          {video && (
-            <InputForm
-              video={video}
-              setIsSubmitted={setIsSubmitted}
-              isSubmitted={isSubmitted}
-              setShowVideoTitle={setShowVideoTitle}
-              setPrompt={setPrompt}
-              setPlatform={setPlatform}
-            />
-          )}
-          {video && (
-            <Result video={video} isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} prompt={prompt} platform={platform} />
-          )}
-        </>
-      )}
-   </ErrorBoundary>
+            {showVideoTitle && (
+              <div className="GenerateSocialPosts__videoTitle">
+                {vidTitleClean}
+              </div>
+            )}
+            {video && (
+              <InputForm
+                video={video}
+                setIsSubmitted={setIsSubmitted}
+                isSubmitted={isSubmitted}
+                setShowVideoTitle={setShowVideoTitle}
+                setPrompt={setPrompt}
+                setPlatform={setPlatform}
+              />
+            )}
+            {video && (
+              <Result
+                video={video}
+                isSubmitted={isSubmitted}
+                setIsSubmitted={setIsSubmitted}
+                prompt={prompt}
+                platform={platform}
+              />
+            )}
+          </>
+        )}
+      </ErrorBoundary>
     </div>
   );
-}
+};
