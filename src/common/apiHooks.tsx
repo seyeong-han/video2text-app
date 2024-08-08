@@ -8,7 +8,7 @@ export function useGetVideos(indexId: string | undefined) {
     queryKey: [keys.VIDEOS, indexId],
     queryFn: async () => {
       try {
-        if (!indexId) return Error;
+        if (!indexId) throw new Error("indexId is undefined");
         const response = await apiConfig.SERVER.get(
           `${apiConfig.INDEXES_URL}/${indexId}/videos`,
           {
@@ -17,7 +17,8 @@ export function useGetVideos(indexId: string | undefined) {
         );
         return response.data;
       } catch (error) {
-        return error;
+        console.error("Error fetching videos:", error);
+        throw error;
       }
     },
   });
