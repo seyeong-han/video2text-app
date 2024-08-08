@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { keys } from "./keys";
 import apiConfig from "./apiConfig";
-import { Task } from "./types"
+import { Task } from "./types";
 
 export function useGetVideos(indexId: string | undefined) {
   return useQuery({
