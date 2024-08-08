@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import { useEffect, Suspense } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {keys} from "./common/keys";
+import { keys } from "./common/keys";
 import LoadingSpinner from "./common/LoadingSpinner";
 import { GenerateSocialPosts } from "./GenerateSocialPosts";
 import { useGetVideos } from "./common/apiHooks";
@@ -17,12 +17,20 @@ import ErrorFallback from "./common/ErrorFallback";
  */
 
 function App() {
-  const { data: videos, refetch: refetchVideos, isLoading, isError, error } = useGetVideos(apiConfig.INDEX_ID);
+  const {
+    data: videos,
+    refetch: refetchVideos,
+    isLoading,
+    isError,
+    error,
+  } = useGetVideos(apiConfig.INDEX_ID);
   const queryClient = useQueryClient();
 
   useEffect(() => {
     if (apiConfig.INDEX_ID) {
-      queryClient.invalidateQueries({queryKey: [keys.VIDEOS, apiConfig.INDEX_ID]});
+      queryClient.invalidateQueries({
+        queryKey: [keys.VIDEOS, apiConfig.INDEX_ID],
+      });
     }
   }, [queryClient]);
 
