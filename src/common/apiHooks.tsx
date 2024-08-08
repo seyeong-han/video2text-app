@@ -187,7 +187,9 @@ export function useGetTask(taskId: string) {
     queryKey: [keys.TASK, taskId],
     queryFn: async (): Promise<Task> => {
       try {
-        const response = await apiConfig.SERVER.get(`${apiConfig.TASKS_URL}/${taskId}`);
+        const response = await apiConfig.SERVER.get(
+          `${apiConfig.TASKS_URL}/${taskId}`
+        );
         const respData: Task = response.data;
         return respData;
       } catch (error) {
