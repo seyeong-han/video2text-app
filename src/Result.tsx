@@ -4,30 +4,30 @@ import "./Result.css";
 import { useGenerate } from "./common/apiHooks";
 import { keys } from "./common/keys";
 import { ErrorBoundary } from "./common/ErrorBoundary";
-import LoadingSpinner from "./common/LoadingSpinner";
-import { Video } from './common/types';
-
-/** Shows the results
- *
- * GenerateSocialPosts -> Result
- *
- */
+import { Video as TypeVideo } from "./common/types";
 
 interface ResultProps {
-  video: Video
+  video: TypeVideo;
   isSubmitted: boolean;
-  setIsSubmitted: (value: boolean) => void;
-  prompt: string;
-  platform: string;
+  field1Prompt: { type: string | null } | null;
+  field2Prompt: { type: string | null } | null;
+  field3Prompt: { type: string | null } | null;
 }
 
-export const Result: React.FC<ResultProps> = ({ video, isSubmitted, setIsSubmitted, prompt, platform }) => {
-  const {
-    data: result,
-    isLoading,
-    isFetching,
-  } = useGenerate(
-    prompt,
+interface Chapter {
+  chapter_title: string;
+  start: number;
+  end: number;
+  chapter_summary: string;
+}
+
+interface Highlight {
+  highlight: string;
+  start: number;
+  end: number;
+  highlight_summary?: string;
+}
+
     video?._id,
     Boolean(video?._id && prompt?.length > 0 && isSubmitted)
   );
