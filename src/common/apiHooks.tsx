@@ -80,6 +80,108 @@ export function useGenerate(prompt: string, videoId: string, enabled: boolean) {
   });
 }
 
+export async function fetchVideoInfo(
+  queryClient: QueryClient,
+  url: string
+): Promise<any> {
+  try {
+    const response = await queryClient.fetchQuery({
+      queryKey: [keys.VIDEO, url],
+      queryFn: async () => {
+        const response = await apiConfig.SERVER.get(
+          `/video-info?url=${encodeURIComponent(url)}`
+        );
+        return response.data;
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error fetching video information:", error);
+    throw error;
+  }
+}
+
+export function useGenerateSummary(
+  data: any,
+  videoId: string,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: [keys.VIDEOS, "summarize", videoId],
+    queryFn: async () => {
+      try {
+        if (!enabled) {
+          return null;
+        }
+
+        const response = await apiConfig.SERVER.post(
+          `/videos/${videoId}/summarize`,
+          { data }
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error generating summary:", error);
+        throw error;
+      }
+    },
+    enabled: enabled,
+  });
+}
+
+export function useGenerateChapters(
+  data: any,
+  videoId: string,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: [keys.VIDEOS, "chapters", videoId],
+    queryFn: async () => {
+      try {
+        if (!enabled) {
+          return null;
+        }
+
+        const response = await apiConfig.SERVER.post(
+          `/videos/${videoId}/summarize`,
+          { data }
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error generating chapters:", error);
+        throw error;
+      }
+    },
+    enabled: enabled,
+  });
+}
+
+export function useGenerateHighlights(
+  data: any,
+  videoId: string,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: [keys.VIDEOS, "highlights", videoId],
+    queryFn: async () => {
+      try {
+        if (!enabled) {
+          return null;
+        }
+
+        const response = await apiConfig.SERVER.post(
+          `/videos/${videoId}/summarize`,
+          { data }
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error generating highlights:", error);
+        throw error;
+      }
+    },
+    enabled: enabled,
+  });
+}
+
 export function useGetTask(taskId: string) {
   return useQuery<Task, Error, Task, [string, string]>({
     queryKey: [keys.TASK, taskId],
