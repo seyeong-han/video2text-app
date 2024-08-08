@@ -4,7 +4,7 @@ import { useEffect, Suspense } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { keys } from "./common/keys";
 import LoadingSpinner from "./common/LoadingSpinner";
-import { GenerateSocialPosts } from "./GenerateSocialPosts";
+import { SummarizeMain } from "./SummarizeMain";
 import { useGetVideos } from "./common/apiHooks";
 import { ErrorBoundary } from "./common/ErrorBoundary";
 import apiConfig from "./common/apiConfig";
@@ -51,7 +51,7 @@ function App() {
       <Suspense fallback={<LoadingSpinner />}>
         <div className="app">
           {videos?.data ? (
-            <GenerateSocialPosts
+            <SummarizeMain
               index={apiConfig.INDEX_ID}
               videoId={videos.data[0]?._id || null}
               refetchVideos={refetchVideos}
