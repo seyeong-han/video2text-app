@@ -79,7 +79,7 @@ export function SummarizeMain({
 
   return (
     <div className="summarizeVideo">
-      <h1 className="summarizeVideo__appTitle">Summarize a YouTube Video</h1>
+      <h1 className="summarizeVideo__appTitle">Summarize Your Video</h1>
       <ErrorBoundary>
         {isLoading && <LoadingSpinner />}
         <VideoFileUploadForm
