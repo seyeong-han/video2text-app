@@ -44,6 +44,7 @@ export function SummarizeMain({
   const [showCheckWarning, setShowCheckWarning] = useState<boolean>(false);
   const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [prompt, setPrompt] = useState<string>("");
 
   const queryClient = useQueryClient();
 
@@ -133,6 +134,9 @@ export function SummarizeMain({
               field5={field5}
               field6={field6}
               fieldTypes={fieldTypes}
+              isSubmitted={isSubmitted}
+              showCheckWarning={showCheckWarning}
+              setPrompt={setPrompt}
               setIsSubmitted={setIsSubmitted}
               setShowVideoTitle={setShowVideoTitle}
               setShowCheckWarning={setShowCheckWarning}
@@ -141,6 +145,7 @@ export function SummarizeMain({
               video={video}
               isSubmitted={isSubmitted}
               fieldTypes={fieldTypes}
+              prompt={prompt}
             />
           </>
         )}
