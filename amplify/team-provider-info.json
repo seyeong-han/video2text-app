@@ -1,0 +1,26 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-video2textapp-dev-d8d5f-authRole",
+      "UnauthRoleArn": "arn:aws:iam::654654171501:role/amplify-video2textapp-dev-d8d5f-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::654654171501:role/amplify-video2textapp-dev-d8d5f-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-video2textapp-dev-d8d5f-deployment",
+      "UnauthRoleName": "amplify-video2textapp-dev-d8d5f-unauthRole",
+      "StackName": "amplify-video2textapp-dev-d8d5f",
+      "StackId": "arn:aws:cloudformation:us-east-2:654654171501:stack/amplify-video2textapp-dev-d8d5f/65b4ae70-567f-11ef-8673-0a5ebded7a23",
+      "AmplifyAppId": "d2ysuybmdlc5oi"
+    },
+    "categories": {
+      "function": {
+        "server": {
+          "deploymentBucketName": "amplify-video2textapp-dev-d8d5f-deployment",
+          "s3Key": "amplify-builds/server-4b44316b4e545951452b-build.zip"
+        }
+      },
+      "api": {
+        "serverAPI": {}
+      }
+    }
+  }
+}
