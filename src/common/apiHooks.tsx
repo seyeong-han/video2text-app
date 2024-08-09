@@ -206,3 +206,32 @@ export function useGetTask(taskId: string) {
     refetchIntervalInBackground: true,
   });
 }
+
+export function useGenerateTitleTopicHashtag(
+  types: Set<string>,
+  videoId: string,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: [keys.VIDEOS, "gist", videoId],
+    queryFn: async () => {
+      try {
+        if (!enabled) {
+          return null;
+        }
+
+        const response = await apiConfig.SERVER.post(
+          `/videos/${videoId}/gist`,
+          {
+            data: { types: Array.from(types) },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error generating title, topic, and hashtag:", error);
+        throw error;
+      }
+    },
+    enabled: enabled,
+  });
+}
