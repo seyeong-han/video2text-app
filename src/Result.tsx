@@ -103,7 +103,7 @@ export function Result({ video, isSubmitted, fieldTypes }: ResultProps) {
         {titleTopicHashtagResults && isSubmitted && (
           <>
             {/* Display topics */}
-            {titleTopicHashtagResults.topics?.length > 0 ? (
+            {titleTopicHashtagResults.topics?.length > 0 && (
               <div className="result__topics">
                 <h2 className="result__topics__title">Topic</h2>
                 <div className="result__topics__topics">
@@ -114,24 +114,20 @@ export function Result({ video, isSubmitted, fieldTypes }: ResultProps) {
                   ))}
                 </div>
               </div>
-            ) : (
-              <p>No topics available</p>
             )}
 
             {/* Display title */}
-            {titleTopicHashtagResults.title?.length > 0 ? (
+            {titleTopicHashtagResults.title?.length > 0 && (
               <div className="result__title">
                 <h2 className="result__title__title">Title</h2>
                 <div className="result__title__titleData">
                   {titleTopicHashtagResults.title}
                 </div>
               </div>
-            ) : (
-              <p>No title available</p>
             )}
 
             {/* Display hashtags */}
-            {titleTopicHashtagResults.hashtags?.length > 0 ? (
+            {titleTopicHashtagResults.hashtags?.length > 0 && (
               <div className="result__hashtags">
                 <h2 className="result__hashtags__title">Hashtags</h2>
                 <div className="result__hashtags__hashtags">
@@ -142,8 +138,6 @@ export function Result({ video, isSubmitted, fieldTypes }: ResultProps) {
                   ))}
                 </div>
               </div>
-            ) : (
-              <p>No hashtags available</p>
             )}
           </>
         )}
