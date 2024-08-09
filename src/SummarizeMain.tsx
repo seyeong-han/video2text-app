@@ -104,6 +104,18 @@ export function SummarizeMain({
             </div>
           </div>
         )}
+        {showCheckWarning && (
+          <div className="summarizeVideo__warningMessageWrapper">
+            <img
+              className="summarizeVideo__warningMessageWrapper__warningIcon"
+              src={greenWarningIcon}
+              alt="WarningIcon"
+            ></img>
+            <div className="summarizeVideo__warningMessageWrapper__warningMessage">
+              Please select one of the checkboxes
+            </div>
+          </div>
+        )}
         {!isFileUploading && video && (
           <>
             <Video url={video.hls?.video_url} width="381px" height="214px" />
