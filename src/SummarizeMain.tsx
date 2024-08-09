@@ -30,16 +30,15 @@ export function SummarizeMain({
     Boolean(videoId)
   );
 
-  const [field1, field2, field3] = ["summary", "chapter", "highlight"] as const;
-  const [field1Prompt, setField1Prompt] = useState<{
-    type: string | null;
-  } | null>(null);
-  const [field2Prompt, setField2Prompt] = useState<{
-    type: string | null;
-  } | null>(null);
-  const [field3Prompt, setField3Prompt] = useState<{
-    type: string | null;
-  } | null>(null);
+  const [field1, field2, field3, field4, field5, field6] = [
+    "topic",
+    "title",
+    "hashtag",
+    "summary",
+    "chapter",
+    "highlight",
+  ] as const;
+  const [fieldTypes, setFieldTypes] = useState<Set<string>>(new Set());
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [showVideoTitle, setShowVideoTitle] = useState<boolean>(false);
   const [showCheckWarning, setShowCheckWarning] = useState<boolean>(false);
@@ -59,10 +58,8 @@ export function SummarizeMain({
     return cleanedFilename;
   }
 
-  async function resetPrompts() {
-    setField1Prompt({ type: null });
-    setField2Prompt({ type: null });
-    setField3Prompt({ type: null });
+  async function resetFieldTypes() {
+    setFieldTypes(new Set());
   }
 
   useEffect(() => {
@@ -72,6 +69,12 @@ export function SummarizeMain({
       });
     };
     fetchData();
+    resetFieldTypes();
+    setIsSubmitted(false);
+    setShowVideoTitle(false);
+    setShowCheckWarning(false);
+    setSelectedFile(null);
+    setIsFileUploading(false);
   }, [index, videoId, queryClient]);
 
   return (
@@ -111,12 +114,13 @@ export function SummarizeMain({
             )}
             <InputForm
               video={video}
-              setField1Prompt={setField1Prompt}
-              setField2Prompt={setField2Prompt}
-              setField3Prompt={setField3Prompt}
               field1={field1}
               field2={field2}
               field3={field3}
+              field4={field4}
+              field5={field5}
+              field6={field6}
+              fieldTypes={fieldTypes}
               setIsSubmitted={setIsSubmitted}
               setShowVideoTitle={setShowVideoTitle}
               setShowCheckWarning={setShowCheckWarning}
@@ -124,9 +128,7 @@ export function SummarizeMain({
             <Result
               video={video}
               isSubmitted={isSubmitted}
-              field1Prompt={field1Prompt}
-              field2Prompt={field2Prompt}
-              field3Prompt={field3Prompt}
+              fieldTypes={fieldTypes}
             />
           </>
         )}
