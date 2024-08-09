@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
 const app = express();
@@ -6,14 +5,20 @@ const upload = multer();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const axios = require("axios");
+const serverless = require("serverless-http");
 
 /** Define constants and configure TL API endpoints */
-const TWELVE_LABS_API_KEY = process.env.REACT_APP_API_KEY;
-const API_BASE_URL = "https://api.twelvelabs.io/v1.2";
-const PORT_NUMBER = process.env.REACT_APP_PORT_NUMBER || 4001;
+const TWELVE_LABS_API_KEY = process.env.TWELVE_LABS_API_KEY;
+const API_BASE_URL =
+  process.env.API_BASE_URL || "https://api.twelvelabs.io/v1.2";
 
 /** Set up middleware for Express */
-app.use(cors());
+const corsOptions = {
+  origin:
+    process.env.CORS_ORIGIN || "https://main.d2a7uk4042n8z4.amplifyapp.com",
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(
@@ -40,16 +45,7 @@ process.on("uncaughtException", function (exception) {
   console.log(exception);
 });
 
-/** Set up Express server to listen on port 4002 */
-app.listen(PORT_NUMBER, () => {
-  console.log(`Server Running. Listening on port ${PORT_NUMBER}`);
-});
-
-const HEADERS = {
-  "Content-Type": "application/json",
-  "x-api-key": TWELVE_LABS_API_KEY,
-};
-
+/** Define your routes */
 /** Get videos */
 app.get("/indexes/:indexId/videos", async (request, response, next) => {
   const params = {
@@ -60,7 +56,10 @@ app.get("/indexes/:indexId/videos", async (request, response, next) => {
     const options = {
       method: "GET",
       url: `${API_BASE_URL}/indexes/${request.params.indexId}/videos`,
-      headers: { ...HEADERS },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": TWELVE_LABS_API_KEY,
+      },
       data: { params },
     };
     const apiResponse = await axios.request(options);
@@ -216,3 +215,5 @@ app.post("/videos/:videoId/gist", async (request, response, next) => {
     return next({ status, message });
   }
 });
+
+module.exports.handler = serverless(app);
