@@ -91,14 +91,14 @@ export function SummarizeMain({
           setIsFileUploading={setIsFileUploading}
         />
         {!isLoading && !video && (
-          <div className="GenerateSocialPosts__uploadMessageWrapper">
+          <div className="summarizeVideo__uploadMessageWrapper">
             <img
-              className="GenerateSocialPosts__uploadMessageWrapper__warningIcon"
+              className="summarizeVideo__uploadMessageWrapper__warningIcon"
               src={greenWarningIcon}
               alt="greenWarningIcon"
             />
             <div>
-              <p className="GenerateSocialPosts__uploadMessageWrapper__message">
+              <p className="summarizeVideo__uploadMessageWrapper__message">
                 Please upload a video
               </p>
             </div>
