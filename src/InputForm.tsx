@@ -3,8 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { keys } from "./common/keys";
 import { Video } from "./common/types";
 import "./InputForm.css";
-import { faCommentDots } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const WarningIcon: string = require("./common/Warning.svg").default;
 interface InputFormProps {
