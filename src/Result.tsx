@@ -7,17 +7,22 @@ import {
   useGenerateSummary,
   useGenerateChapters,
   useGenerateHighlights,
+  useGenerateTitleTopicHashtag,
 } from "./common/apiHooks";
 import { keys } from "./common/keys";
 import { ErrorBoundary } from "./common/ErrorBoundary";
 import { Video as TypeVideo } from "./common/types";
 
+/** Shows the results
+ *
+ * SummarizeMain -> Result
+ *
+ */
+
 interface ResultProps {
   video: TypeVideo;
   isSubmitted: boolean;
-  field1Prompt: { type: string | null } | null;
-  field2Prompt: { type: string | null } | null;
-  field3Prompt: { type: string | null } | null;
+  fieldTypes: Set<string>;
 }
 
 interface Chapter {
@@ -34,27 +39,37 @@ interface Highlight {
   highlight_summary?: string;
 }
 
-export function Result({
-  video,
-  isSubmitted,
-  field1Prompt,
-  field2Prompt,
-  field3Prompt,
-}: ResultProps) {
-  const { data: field1Result } = useGenerateSummary(
-    field1Prompt,
+export function Result({ video, isSubmitted, fieldTypes }: ResultProps) {
+  const { data: summaryResult } = useGenerateSummary(
+    { type: "summary" },
     video?._id,
-    Boolean(video?._id && field1Prompt?.type && isSubmitted)
+    Boolean(video?._id && fieldTypes.has("summary") && isSubmitted)
   );
-  const { data: field2Result } = useGenerateChapters(
-    field2Prompt,
+
+  const { data: chaptersResult } = useGenerateChapters(
+    { type: "chapter" },
     video?._id,
-    Boolean(video?._id && field2Prompt?.type && isSubmitted)
+    Boolean(video?._id && fieldTypes.has("chapter") && isSubmitted)
   );
-  const { data: field3Result } = useGenerateHighlights(
-    field3Prompt,
+
+  const { data: highlightsResult } = useGenerateHighlights(
+    { type: "highlight" },
     video?._id,
-    Boolean(video?._id && field3Prompt?.type && isSubmitted)
+    Boolean(video?._id && fieldTypes.has("highlight") && isSubmitted)
+  );
+
+  const types = new Set(
+    [...fieldTypes].filter(
+      (type) => !["summary", "chapter", "highlight"].includes(type)
+    )
+  );
+
+  console.log("types", types);
+
+  const { data: titleTopicHashtagResults } = useGenerateTitleTopicHashtag(
+    types,
+    video?._id,
+    Boolean(video?._id && types?.size > 0 && isSubmitted)
   );
   const queryClient = useQueryClient();
 
@@ -68,13 +83,8 @@ export function Result({
         "highlights",
       ],
     });
-  }, [
-    field1Prompt?.type,
-    field2Prompt?.type,
-    field3Prompt?.type,
-    video?._id,
-    queryClient,
-  ]);
+    console.log("titleTopicHashtagResults", titleTopicHashtagResults);
+  }, [fieldTypes, video?._id, queryClient]);
 
   /** Format seconds to hours:minutes:seconds */
   function formatTime(timeInSeconds: number): string {
@@ -90,31 +100,77 @@ export function Result({
   return (
     <ErrorBoundary>
       <div className="result">
-        {field1Prompt?.type && isSubmitted && (
+        {titleTopicHashtagResults && isSubmitted && (
+          <>
+            {/* Display topics */}
+            {titleTopicHashtagResults.topics?.length > 0 ? (
+              <div className="result__topics">
+                <h2 className="result__topics__title">Topic</h2>
+                <div className="result__topics__topics">
+                  {titleTopicHashtagResults.topics.map((topic: string) => (
+                    <div className="result__topics__topic" key={topic}>
+                      {topic}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p>No topics available</p>
+            )}
+
+            {/* Display title */}
+            {titleTopicHashtagResults.title?.length > 0 ? (
+              <div className="result__title">
+                <h2 className="result__title__title">Title</h2>
+                <div className="result__title__titleData">
+                  {titleTopicHashtagResults.title}
+                </div>
+              </div>
+            ) : (
+              <p>No title available</p>
+            )}
+
+            {/* Display hashtags */}
+            {titleTopicHashtagResults.hashtags?.length > 0 ? (
+              <div className="result__hashtags">
+                <h2 className="result__hashtags__title">Hashtags</h2>
+                <div className="result__hashtags__hashtags">
+                  {titleTopicHashtagResults.hashtags.map((hashtag: string) => (
+                    <div className="result__hashtags__hashtag" key={hashtag}>
+                      #{hashtag}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p>No hashtags available</p>
+            )}
+          </>
+        )}
+        {fieldTypes.has("summary") && isSubmitted && (
           <div className="result__summary">
             <h2 className="result__summary__title">Sentences</h2>
-            {field1Result ? (
+            {summaryResult ? (
               <div className="result__summary__summary">
-                {field1Result.summary}
+                {summaryResult.summary}
               </div>
             ) : (
               <LoadingSpinner />
             )}
           </div>
         )}
-        {field2Prompt?.type && isSubmitted && (
+        {fieldTypes.has("chapter") && isSubmitted && (
           <div className="result__chapters">
             <h2 className="result__chapters__title">Chapters</h2>
             <div className="result__chapters__wrapper">
-              {field2Result &&
-                Array.isArray(field2Result.chapters) &&
-                field2Result.chapters.map((chapter: Chapter) => (
+              {chaptersResult &&
+                Array.isArray(chaptersResult.chapters) &&
+                chaptersResult.chapters.map((chapter: Chapter) => (
                   <div
                     className="result__chapters__wrapper__chapter"
                     key={chapter.chapter_title}
                   >
                     <Video
-                      //   url={video.source?.url || video.hls?.video_url}
                       url={video.hls?.video_url}
                       start={chapter.start}
                       end={chapter.end}
@@ -137,28 +193,27 @@ export function Result({
                     </div>
                   </div>
                 ))}
-              {field2Result && !field2Result.chapters && (
+              {chaptersResult && !chaptersResult.chapters && (
                 <p className="result__chapters__wrapper__message">
                   No chapters available
                 </p>
               )}
-              {!field2Result && <LoadingSpinner />}
+              {!chaptersResult && <LoadingSpinner />}
             </div>
           </div>
         )}
-        {field3Prompt?.type && isSubmitted && (
+        {fieldTypes.has("highlight") && isSubmitted && (
           <div className="result__highlights">
             <h2 className="result__highlights__title">Highlights</h2>
             <div className="result__highlights__wrapper">
-              {field3Result &&
-                Array.isArray(field3Result.highlights) &&
-                field3Result.highlights.map((highlight: Highlight) => (
+              {highlightsResult &&
+                Array.isArray(highlightsResult.highlights) &&
+                highlightsResult.highlights.map((highlight: Highlight) => (
                   <div
                     className="result__highlights__wrapper__highlight"
                     key={highlight.highlight}
                   >
                     <Video
-                      //   url={video.source?.url || video.hls?.video_url}
                       url={video.hls?.video_url}
                       start={highlight.start}
                       end={highlight.end}
@@ -176,12 +231,12 @@ export function Result({
                     </div>
                   </div>
                 ))}
-              {field3Result && !field3Result.highlights && (
+              {highlightsResult && !highlightsResult.highlights && (
                 <p className="result__highlights__wrapper__message">
                   No highlights available
                 </p>
               )}
-              {!field3Result && <LoadingSpinner />}
+              {!highlightsResult && <LoadingSpinner />}
             </div>
           </div>
         )}
