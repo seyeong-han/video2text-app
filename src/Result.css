@@ -65,7 +65,8 @@
 .result__highlights__title,
 .result__title__title,
 .result__topics__title,
-.result__hashtags__title {
+.result__hashtags__title,
+.result__prompt_title {
   font-size: 32px;
   font-weight: 500;
   line-height: 44px;
