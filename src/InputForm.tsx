@@ -3,6 +3,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { keys } from "./common/keys";
 import { Video } from "./common/types";
 import "./InputForm.css";
+import { faCommentDots } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const WarningIcon: string = require("./common/Warning.svg").default;
 interface InputFormProps {
@@ -14,6 +16,9 @@ interface InputFormProps {
   field5: string;
   field6: string;
   fieldTypes: Set<string>;
+  isSubmitted: boolean;
+  showCheckWarning: boolean;
+  setPrompt: React.Dispatch<React.SetStateAction<string>>;
   setIsSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
   setShowVideoTitle: React.Dispatch<React.SetStateAction<boolean>>;
   setShowCheckWarning: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,6 +33,9 @@ export function InputForm({
   field5,
   field6,
   fieldTypes,
+  isSubmitted,
+  showCheckWarning,
+  setPrompt,
   setIsSubmitted,
   setShowVideoTitle,
   setShowCheckWarning,
@@ -40,6 +48,10 @@ export function InputForm({
   const summaryRef = useRef<HTMLInputElement>(null);
   const chaptersRef = useRef<HTMLInputElement>(null);
   const highlightsRef = useRef<HTMLInputElement>(null);
+  const promptRef = useRef<HTMLInputElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const [isPromptChecked, setIsPromptChecked] = React.useState(false);
 
   async function handleClick(
     event: React.MouseEvent<HTMLButtonElement>
@@ -82,13 +94,22 @@ export function InputForm({
       fieldTypes.delete(field6);
     }
 
+    if (promptRef.current?.checked) {
+      fieldTypes.add("prompt");
+      setPrompt(textAreaRef.current?.value ?? "");
+    } else {
+      fieldTypes.delete("prompt");
+      setPrompt("");
+    }
+
     if (
       !topicRef.current?.checked &&
       !titleRef.current?.checked &&
       !hashtagRef.current?.checked &&
       !summaryRef.current?.checked &&
       !chaptersRef.current?.checked &&
-      !highlightsRef.current?.checked
+      !highlightsRef.current?.checked &&
+      !promptRef.current?.checked
     ) {
       setShowVideoTitle(false);
       setShowCheckWarning(true);
@@ -114,6 +135,7 @@ export function InputForm({
     if (summaryRef.current) summaryRef.current.checked = true;
     if (chaptersRef.current) chaptersRef.current.checked = true;
     if (highlightsRef.current) highlightsRef.current.checked = true;
+    if (promptRef.current) promptRef.current.checked = false;
   }, []);
 
   return (
@@ -217,6 +239,45 @@ export function InputForm({
               {field6}
             </label>
           </div>
+          <div className="inputForm__form__checkboxes__wrapper">
+            <input
+              type="checkbox"
+              className="inputForm__form__checkboxes__wrapper__checkbox"
+              data-cy="data-cy-checkbox-inputForm"
+              name="prompt"
+              value="open-ended descriptions"
+              ref={promptRef}
+              id="prompt"
+              onChange={() => setIsPromptChecked(!isPromptChecked)}
+            />
+            <label
+              className="inputForm__form__checkboxes__wrapper__label"
+              htmlFor="prompt"
+            >
+              Open-ended descriptions
+            </label>
+          </div>
+          <textarea
+            className="inputForm__form__textarea"
+            data-cy="data-cy-inputForm-textarea"
+            id="prompt"
+            name="prompt"
+            placeholder="Write your own requirements / prompt here"
+            ref={textAreaRef}
+            disabled={isSubmitted || !isPromptChecked}
+          />
+          {isPromptChecked && !textAreaRef.current?.value && (
+            <div className="inputForm__form__warningMessageWrapper">
+              <img
+                className="inputForm__form__warningMessageWrapper__warningIcon"
+                src={WarningIcon}
+                alt="WarningIcon"
+              />
+              <div className="inputForm__form__warningMessageWrapper__warningMessage">
+                Please provide your own requirements / prompt
+              </div>
+            </div>
+          )}
         </div>
         <button
           className="inputForm__form__button"
