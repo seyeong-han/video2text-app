@@ -7,18 +7,13 @@ import "./InputForm.css";
 const WarningIcon: string = require("./common/Warning.svg").default;
 interface InputFormProps {
   video: Video;
-  setField1Prompt: React.Dispatch<
-    React.SetStateAction<{ type: string | null } | null>
-  >;
-  setField2Prompt: React.Dispatch<
-    React.SetStateAction<{ type: string | null } | null>
-  >;
-  setField3Prompt: React.Dispatch<
-    React.SetStateAction<{ type: string | null } | null>
-  >;
   field1: string;
   field2: string;
   field3: string;
+  field4: string;
+  field5: string;
+  field6: string;
+  fieldTypes: Set<string>;
   setIsSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
   setShowVideoTitle: React.Dispatch<React.SetStateAction<boolean>>;
   setShowCheckWarning: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,18 +21,22 @@ interface InputFormProps {
 
 export function InputForm({
   video,
-  setField1Prompt,
-  setField2Prompt,
-  setField3Prompt,
   field1,
   field2,
   field3,
+  field4,
+  field5,
+  field6,
+  fieldTypes,
   setIsSubmitted,
   setShowVideoTitle,
   setShowCheckWarning,
 }: InputFormProps): JSX.Element {
   const queryClient = useQueryClient();
 
+  const topicRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const hashtagRef = useRef<HTMLInputElement>(null);
   const summaryRef = useRef<HTMLInputElement>(null);
   const chaptersRef = useRef<HTMLInputElement>(null);
   const highlightsRef = useRef<HTMLInputElement>(null);
@@ -47,25 +46,46 @@ export function InputForm({
   ): Promise<void> {
     event.preventDefault();
 
-    if (summaryRef.current?.checked) {
-      setField1Prompt({ type: field1 });
+    if (topicRef.current?.checked) {
+      fieldTypes.add(field1);
     } else {
-      setField1Prompt(null);
+      fieldTypes.delete(field1);
+    }
+
+    if (titleRef.current?.checked) {
+      fieldTypes.add(field2);
+    } else {
+      fieldTypes.delete(field2);
+    }
+
+    if (hashtagRef.current?.checked) {
+      fieldTypes.add(field3);
+    } else {
+      fieldTypes.delete(field3);
+    }
+
+    if (summaryRef.current?.checked) {
+      fieldTypes.add(field4);
+    } else {
+      fieldTypes.delete(field4);
     }
 
     if (chaptersRef.current?.checked) {
-      setField2Prompt({ type: field2 });
+      fieldTypes.add(field5);
     } else {
-      setField2Prompt(null);
+      fieldTypes.delete(field5);
     }
 
     if (highlightsRef.current?.checked) {
-      setField3Prompt({ type: field3 });
+      fieldTypes.add(field6);
     } else {
-      setField3Prompt(null);
+      fieldTypes.delete(field6);
     }
 
     if (
+      !topicRef.current?.checked &&
+      !titleRef.current?.checked &&
+      !hashtagRef.current?.checked &&
       !summaryRef.current?.checked &&
       !chaptersRef.current?.checked &&
       !highlightsRef.current?.checked
@@ -82,9 +102,15 @@ export function InputForm({
     queryClient.invalidateQueries({
       queryKey: [keys.VIDEOS, video._id, "summarize", "chapters", "highlights"],
     });
+    queryClient.invalidateQueries({
+      queryKey: [keys.VIDEOS, video._id, "gist"],
+    });
   }
 
   useEffect(() => {
+    if (topicRef.current) topicRef.current.checked = true;
+    if (titleRef.current) titleRef.current.checked = true;
+    if (hashtagRef.current) hashtagRef.current.checked = true;
     if (summaryRef.current) summaryRef.current.checked = true;
     if (chaptersRef.current) chaptersRef.current.checked = true;
     if (highlightsRef.current) highlightsRef.current.checked = true;
@@ -99,10 +125,10 @@ export function InputForm({
             <input
               className="inputForm__form__checkboxes__wrapper__checkbox"
               type="checkbox"
-              data-cy="data-cy-checkbox-summary"
+              data-cy="data-cy-checkbox-topic"
               id={field1}
               name={field1}
-              ref={summaryRef}
+              ref={topicRef}
             />
             <label
               className="inputForm__form__checkboxes__wrapper__label"
@@ -115,8 +141,8 @@ export function InputForm({
             <input
               className="inputForm__form__checkboxes__wrapper__checkbox"
               type="checkbox"
-              ref={chaptersRef}
-              data-cy="data-cy-checkbox-chapters"
+              ref={titleRef}
+              data-cy="data-cy-checkbox-title"
               id={field2}
               name={field2}
             />
@@ -124,7 +150,55 @@ export function InputForm({
               className="inputForm__form__checkboxes__wrapper__label"
               htmlFor={field2}
             >
-              {field2}s
+              {field2}
+            </label>
+          </div>
+          <div className="inputForm__form__checkboxes__wrapper">
+            <input
+              className="inputForm__form__checkboxes__wrapper__checkbox"
+              type="checkbox"
+              ref={hashtagRef}
+              data-cy="data-cy-checkbox-hashtag"
+              id={field3}
+              name={field3}
+            />
+            <label
+              className="inputForm__form__checkboxes__wrapper__label"
+              htmlFor={field3}
+            >
+              {field3}
+            </label>
+          </div>
+          <div>
+            <input
+              className="inputForm__form__checkboxes__wrapper__checkbox"
+              type="checkbox"
+              data-cy="data-cy-checkbox-summary"
+              id={field4}
+              name={field4}
+              ref={summaryRef}
+            />
+            <label
+              className="inputForm__form__checkboxes__wrapper__label"
+              htmlFor={field4}
+            >
+              {field4}
+            </label>
+          </div>
+          <div className="inputForm__form__checkboxes__wrapper">
+            <input
+              className="inputForm__form__checkboxes__wrapper__checkbox"
+              type="checkbox"
+              ref={chaptersRef}
+              data-cy="data-cy-checkbox-chapters"
+              id={field5}
+              name={field5}
+            />
+            <label
+              className="inputForm__form__checkboxes__wrapper__label"
+              htmlFor={field5}
+            >
+              {field5}
             </label>
           </div>
           <div className="inputForm__form__checkboxes__wrapper">
@@ -133,14 +207,14 @@ export function InputForm({
               type="checkbox"
               ref={highlightsRef}
               data-cy="data-cy-checkbox-highlights"
-              id={field3}
-              name={field3}
+              id={field6}
+              name={field6}
             />
             <label
               className="inputForm__form__checkboxes__wrapper__label"
-              htmlFor={field3}
+              htmlFor={field6}
             >
-              {field3}s
+              {field6}
             </label>
           </div>
         </div>
