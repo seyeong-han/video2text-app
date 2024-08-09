@@ -1,18 +1,10 @@
 <a id="readme-top"></a>
 
-# Generate Social Posts for Your Video
+# Summarize your video with Pegasus V1's understanding tools!
 
 ## 👋 Introduction
 
-Use this app to effortlessly create social media posts of any type from short, fun Instagram updates to in-depth blog posts loaded with details. As a video content creator, you may already have fantastic video content. With this app, you can swiftly transform it into written content suitable for various social media platforms!
-
-📌 Check out the [Demo](https://generate-social-posts-vercel-client.vercel.app/)! (_Note: This simplified version of the app does not include the video upload form_)
-
-<div align="center">
-  <a href="https://generate-social-posts-vercel-client.vercel.app/">
-    <img src="public/screenshot.jpeg" alt="search result screenshot" style="border: 1px solid black;" />
-  </a>
-</div>
+I have developed a video understanding web page that leverages image APIs to generate textual content from videos. The platform allows users to create titles, topics, hashtags, summaries, chapters, and open-ended texts based on video content. This tool enhances video analysis by providing diverse text generation options, improving accessibility, and enabling more efficient content creation.
 
 ### Built With
 
@@ -52,7 +44,7 @@ Visit [Twelve Labs Playground](https://playground.twelvelabs.io/) to generate yo
 1. Clone the current repo
 
    ```sh
-   git clone git@github.com:mrnkim/generate-social-posts.git
+   git clone git@github.com:seyeong-han/video2text-app.git
    ```
 
 2. Create `.env` file in the root directory and provide the values for each key
@@ -79,9 +71,38 @@ Visit [Twelve Labs Playground](https://playground.twelvelabs.io/) to generate yo
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## 🎯 What's Next?
+## 📌 How did I build this project?
 
-- Add more tests
-- Improve error handling and add data validations
+### Starting from Sample Apps
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+[Sample applications](https://docs.twelvelabs.io/docs/sample-applications)  
+I wanted to deploy generate text (topics, titles, hashtags, summaries, chapters, highlights, and open-ended descriptions) features on my project by using Pegasus-1 model. I could start from scratch, but I always want to leverage open-source benefits by starting from other's base. Therefore, I can focus more on its features, stability and UI/UX. It can seem like a lack of creativity, but I believe integrating required features from various repositories is also a competent and creative way to build a new project.  
+I could get example codes from each project and integrate them into my project. Here are the functions I used in each project.
+
+- [Summarize YouTube Videos](https://docs.twelvelabs.io/docs/sample-apps-summarize-youtube-videos)
+  - API for generating summaries, chapters, and highlights
+- [Generate titles, topics, and hashtags](https://docs.twelvelabs.io/docs/sample-apps-generate-titles-topics-and-hashtags)
+  - API for generating titles, topics, and hashtags
+- [Generate social media posts for your videos](https://docs.twelvelabs.io/docs/generate-social-media-posts-for-your-videos)
+  - API for enerating open-ended descriptions
+  - Video uploading function
+
+### API Implementation
+
+[Generate text from video](https://docs.twelvelabs.io/docs/generate-text-from-video)  
+Thankfully, TwelveLabs have already provided concise documentations with API playground!  
+It was really easy to follow all the steps and their UI was intuitive.
+
+### Challenges
+
+- Starting from AWS Amplify project initialization
+  AWS provides a full-stack development tool, [Amplify](https://docs.amplify.aws/). I already deployed a strong application using Amplify in my [AI startup, Resia](https://resia.design), so I am familiar with this platform. I started from their project initialization, but I got this error while using `twelvelabs-js`.
+
+  ```
+  ReferenceError: process is not defined at new TwelveLabs
+  ```
+
+  I found Amplify Gen2 was using `Vite` build tool, which provides faster startup times and hot module replacement. But `twelvelabs-js` was reading `REACT_APP_API_KEY` using `process.env.REACT_APP_API_KEY` internally. I knew that I could access the `.env` variables using `VITE` prefix, but I couldn't handle the inside of `twelvelabs-js` codes. Consequently, I gave up Amplify starting project.
+
+- First programming using TypeScript
+  While I have extensive experience with React-JS development, this was my first time working with TypeScript. As a result, I spent more time than anticipated figuring out the correct types. Most of the provided examples were implemented in JavaScript, so converting all of them took the longest. However, I believe the input and output stability gained by specifying types is well worth the effort. The process made me appreciate the added value that TypeScript brings to development.
