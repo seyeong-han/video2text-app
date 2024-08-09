@@ -173,3 +173,46 @@ app.get("/tasks/:taskId", async (request, response, next) => {
     return next({ status, message });
   }
 });
+
+/** Summarize a video */
+app.post("/videos/:videoId/summarize", async (request, response, next) => {
+  const videoId = request.params.videoId;
+  let type = request.body.data;
+
+  try {
+    const options = {
+      method: "POST",
+      url: `${API_BASE_URL}/summarize`,
+      headers: { ...HEADERS, accept: "application/json" },
+      data: { ...type, video_id: videoId },
+    };
+    const apiResponse = await axios.request(options);
+    response.json(apiResponse.data);
+  } catch (error) {
+    const status = error.response?.status || 500;
+    const message =
+      error.response?.data?.message || "Error Summarizing a Video";
+    return next({ status, message });
+  }
+});
+
+/** Generate gist of a video */
+app.post("/videos/:videoId/gist", async (request, response, next) => {
+  const videoId = request.params.videoId;
+  let types = request.body.data;
+  try {
+    const options = {
+      method: "POST",
+      url: `${API_BASE_URL}/gist`,
+      headers: { ...HEADERS, accept: "application/json" },
+      data: { ...types, video_id: videoId },
+    };
+    const apiResponse = await axios.request(options);
+    response.json(apiResponse.data);
+  } catch (error) {
+    const status = error.response?.status || 500;
+    const message =
+      error.response?.data?.message || "Error Generating Gist of a Video";
+    return next({ status, message });
+  }
+});
