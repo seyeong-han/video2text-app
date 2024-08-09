@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "./common/LoadingSpinner";
 import "./Result.css";
 import {
+  useGenerate,
   useGenerateSummary,
   useGenerateChapters,
   useGenerateHighlights,
@@ -23,6 +24,7 @@ interface ResultProps {
   video: TypeVideo;
   isSubmitted: boolean;
   fieldTypes: Set<string>;
+  prompt: string;
 }
 
 interface Chapter {
@@ -39,7 +41,12 @@ interface Highlight {
   highlight_summary?: string;
 }
 
-export function Result({ video, isSubmitted, fieldTypes }: ResultProps) {
+export function Result({
+  video,
+  isSubmitted,
+  fieldTypes,
+  prompt,
+}: ResultProps) {
   const { data: summaryResult } = useGenerateSummary(
     { type: "summary" },
     video?._id,
@@ -58,9 +65,19 @@ export function Result({ video, isSubmitted, fieldTypes }: ResultProps) {
     Boolean(video?._id && fieldTypes.has("highlight") && isSubmitted)
   );
 
+  const {
+    data: promptResult,
+    isLoading,
+    isFetching,
+  } = useGenerate(
+    prompt,
+    video?._id,
+    Boolean(video?._id && prompt?.length > 0 && isSubmitted)
+  );
+
   const types = new Set(
     [...fieldTypes].filter(
-      (type) => !["summary", "chapter", "highlight"].includes(type)
+      (type) => !["summary", "chapter", "highlight", "prompt"].includes(type)
     )
   );
 
@@ -83,7 +100,9 @@ export function Result({ video, isSubmitted, fieldTypes }: ResultProps) {
         "highlights",
       ],
     });
-    console.log("titleTopicHashtagResults", titleTopicHashtagResults);
+    queryClient.invalidateQueries({
+      queryKey: [keys.VIDEOS, video?._id, "generate", prompt],
+    });
   }, [fieldTypes, video?._id, queryClient]);
 
   /** Format seconds to hours:minutes:seconds */
@@ -234,6 +253,21 @@ export function Result({ video, isSubmitted, fieldTypes }: ResultProps) {
             </div>
           </div>
         )}
+        {!isLoading && !isFetching && promptResult && (
+          <div className="result__prompt">
+            <h2 className="result__prompt_title">
+              Generated Post for "{prompt}"
+            </h2>
+            <div className="result__prompt__resultData">
+              {promptResult.data
+                .split("\n")
+                .map((paragraph: string, index: number) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
+            </div>
+          </div>
+        )}
+        {(isLoading || isFetching) && <LoadingSpinner />}
       </div>
     </ErrorBoundary>
   );
