@@ -15,7 +15,7 @@
       "function": {
         "server": {
           "deploymentBucketName": "amplify-video2textapp-dev-d8d5f-deployment",
-          "s3Key": "amplify-builds/server-4b44316b4e545951452b-build.zip"
+          "s3Key": "amplify-builds/server-684b70514e486d676132-build.zip"
         }
       },
       "api": {
