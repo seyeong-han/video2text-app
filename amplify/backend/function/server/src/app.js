@@ -5,12 +5,16 @@ const upload = multer();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const axios = require("axios");
-const serverless = require("serverless-http");
 
 /** Define constants and configure TL API endpoints */
 const TWELVE_LABS_API_KEY = process.env.TWELVE_LABS_API_KEY;
 const API_BASE_URL =
   process.env.API_BASE_URL || "https://api.twelvelabs.io/v1.2";
+
+const HEADERS = {
+  "Content-Type": "application/json",
+  "x-api-key": TWELVE_LABS_API_KEY,
+};
 
 /** Set up middleware for Express */
 const corsOptions = {
@@ -56,10 +60,7 @@ app.get("/indexes/:indexId/videos", async (request, response, next) => {
     const options = {
       method: "GET",
       url: `${API_BASE_URL}/indexes/${request.params.indexId}/videos`,
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": TWELVE_LABS_API_KEY,
-      },
+      headers: { ...HEADERS },
       data: { params },
     };
     const apiResponse = await axios.request(options);
@@ -215,5 +216,4 @@ app.post("/videos/:videoId/gist", async (request, response, next) => {
     return next({ status, message });
   }
 });
-
-module.exports.handler = serverless(app);
+module.exports = app;
