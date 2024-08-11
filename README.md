@@ -6,6 +6,9 @@
 
 I have developed a video understanding web page that leverages image APIs to generate textual content from videos. The platform allows users to create titles, topics, hashtags, summaries, chapters, and open-ended texts based on video content. This tool enhances video analysis by providing diverse text generation options, improving accessibility, and enabling more efficient content creation.
 
+You can test the demo webpage using the link below.  
+[DEMO](https://main.d2a7uk4042n8z4.amplifyapp.com/)
+
 ### Built With
 
 - [Twelve Labs API](https://docs.twelvelabs.io/docs)
@@ -16,7 +19,7 @@ I have developed a video understanding web page that leverages image APIs to gen
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## 🔑 Getting Started
+## 🔑 Getting Started Locally
 
 ### Step 1. Generate Twelve Labs API Key
 
@@ -84,14 +87,21 @@ I could get example codes from each project and integrate them into my project. 
 - [Generate titles, topics, and hashtags](https://docs.twelvelabs.io/docs/sample-apps-generate-titles-topics-and-hashtags)
   - API for generating titles, topics, and hashtags
 - [Generate social media posts for your videos](https://docs.twelvelabs.io/docs/generate-social-media-posts-for-your-videos)
-  - API for enerating open-ended descriptions
+  - API for generating open-ended descriptions
   - Video uploading function
 
 ### API Implementation
 
 [Generate text from video](https://docs.twelvelabs.io/docs/generate-text-from-video)  
-Thankfully, TwelveLabs have already provided concise documentations with API playground!  
-It was really easy to follow all the steps and their UI was intuitive.
+Thankfully, TwelveLabs has already provided concise documentation with API playground!  
+It was really easy to follow all the steps, and their UI was intuitive.
+
+### Deploying AWS Web
+I used AWS Amplify Gen2 to deploy this web application. To deploy it on Amplify I modified these part of codes.
+- Get environment variables for frontend from Amplify's hosting setting.
+- Get environment variables for backend from AWS Lambda environment setting.
+- Modify `server` backend code to use `aws-serverless-express` for request handling in Lambda function.
+- Set REST API using AWS API Gateway with `proxy` feature.
 
 ### Challenges
 
@@ -102,7 +112,7 @@ It was really easy to follow all the steps and their UI was intuitive.
   ReferenceError: process is not defined at new TwelveLabs
   ```
 
-  I found Amplify Gen2 was using `Vite` build tool, which provides faster startup times and hot module replacement. But `twelvelabs-js` was reading `REACT_APP_API_KEY` using `process.env.REACT_APP_API_KEY` internally. I knew that I could access the `.env` variables using `VITE` prefix, but I couldn't handle the inside of `twelvelabs-js` codes. Consequently, I gave up Amplify starting project.
+  I found Amplify Gen2 was using `Vite` build tool, which provides faster startup times and hot module replacement. But `twelvelabs-js` was reading `REACT_APP_API_KEY` using `process.env.REACT_APP_API_KEY` internally. I knew that I could access the `.env` variables using `VITE` prefix, but I couldn't handle the inside of `twelvelabs-js` codes. Consequently, I gave up starting from the Amplify tutorial project.
 
 - First programming using TypeScript
   While I have extensive experience with React-JS development, this was my first time working with TypeScript. As a result, I spent more time than anticipated figuring out the correct types. Most of the provided examples were implemented in JavaScript, so converting all of them took the longest. However, I believe the input and output stability gained by specifying types is well worth the effort. The process made me appreciate the added value that TypeScript brings to development.
